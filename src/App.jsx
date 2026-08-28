@@ -6,12 +6,13 @@ import { AutoMatchingHub } from './components/Matching/AutoMatchingHub';
 import { VerifiedPortfolio } from './components/Portfolio/VerifiedPortfolio';
 import { RecruiterPortal } from './components/Recruiter/RecruiterPortal';
 import { ProjectCreator } from './components/Projects/ProjectCreator';
+import { StudentLogin } from './components/Auth/StudentLogin';
 import { VerificationModal } from './components/VerificationModal';
-import { Award, Briefcase, UserCheck, CheckCircle2, Info, Sparkles } from 'lucide-react';
+import { Award, Briefcase, UserCheck, CheckCircle2, Info, Sparkles, GraduationCap } from 'lucide-react';
 
 export function AppContent() {
   const { activeRole, notification } = useApp();
-  const [candidateTab, setCandidateTab] = useState('assessments'); // 'assessments' | 'matching' | 'portfolio'
+  const [candidateTab, setCandidateTab] = useState('assessments');
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -36,6 +37,9 @@ export function AppContent() {
       {/* Main Workspace Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
+        {/* Student Login Page */}
+        {activeRole === 'student_login' && <StudentLogin />}
+
         {/* Candidate View Layout */}
         {activeRole === 'candidate' && (
           <div className="space-y-6">

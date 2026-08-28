@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ShieldCheck, Award, GitBranch, ExternalLink, Key, Plus, Sparkles, MapPin, Mail, CheckCircle2, User, FileCode, Share2, Layers } from 'lucide-react';
+import { ShieldCheck, Award, GitBranch, ExternalLink, Key, Plus, Sparkles, MapPin, Mail, CheckCircle2, User, FileCode, Share2, Layers, Edit3 } from 'lucide-react';
+import { EditSkillProfileModal } from './EditSkillProfileModal';
 
 export function VerifiedPortfolio() {
   const { activeCandidate, setActiveVerificationModal, addProofOfWork } = useApp();
   const [showAddPowModal, setShowAddPowModal] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+
   const [powForm, setPowForm] = useState({
     title: '',
     description: '',
@@ -84,6 +87,13 @@ export function VerifiedPortfolio() {
             </div>
 
             <div className="flex items-center gap-2 w-full md:w-auto">
+              <button
+                onClick={() => setShowEditProfileModal(true)}
+                className="flex-1 md:flex-none px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-cyan-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-cyan-400" /> Edit Skill Profile
+              </button>
+
               <button
                 onClick={() => setShowAddPowModal(true)}
                 className="flex-1 md:flex-none px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/20 transition-all"
@@ -223,6 +233,14 @@ export function VerifiedPortfolio() {
           ))}
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && (
+        <EditSkillProfileModal
+          candidate={activeCandidate}
+          onClose={() => setShowEditProfileModal(false)}
+        />
+      )}
 
       {/* Add New Proof of Work Modal */}
       {showAddPowModal && (

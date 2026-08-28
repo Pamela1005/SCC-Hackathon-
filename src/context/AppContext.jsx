@@ -4,8 +4,9 @@ import { INITIAL_CANDIDATES, ASSESSMENT_SUITES, REAL_WORLD_PROJECTS } from '../d
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const [activeRole, setActiveRole] = useState('candidate'); // 'candidate' | 'recruiter' | 'project_creator'
+  const [activeRole, setActiveRole] = useState('candidate'); // 'candidate' | 'recruiter' | 'project_creator' | 'student_login'
   const [activeCandidateId, setActiveCandidateId] = useState('cand-1');
+  
   const [candidates, setCandidates] = useState(() => {
     const saved = localStorage.getItem('skillproof_candidates');
     return saved ? JSON.parse(saved) : INITIAL_CANDIDATES;
@@ -21,12 +22,11 @@ export function AppProvider({ children }) {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [activeAssessment, setActiveAssessment] = useState(null); // Currently open assessment modal/runner
-  const [activeVerificationModal, setActiveVerificationModal] = useState(null); // Crypto hash inspector modal
+  const [activeAssessment, setActiveAssessment] = useState(null);
+  const [activeVerificationModal, setActiveVerificationModal] = useState(null);
   const [selectedCandidateForRecruiter, setSelectedCandidateForRecruiter] = useState('cand-1');
   const [notification, setNotification] = useState(null);
 
-  // Sync state to localStorage
   useEffect(() => {
     localStorage.setItem('skillproof_candidates', JSON.stringify(candidates));
   }, [candidates]);
@@ -48,6 +48,82 @@ export function AppProvider({ children }) {
 
   const activeCandidate = candidates.find(c => c.id === activeCandidateId) || candidates[0];
 
+  // Student Authentication Methods
+  const loginStudent = (email, password) => {
+    const found = candidates.find(c => c.email.toLowerCase() === email.toLowerCase());
+    if (found) {
+      setActiveCandidateId(found.id);
+      showToast(`Welcome back, ${found.name}! Signed into Student Verified Portal.`);
+      return true;
+    } else {
+      // Create session for entered email if not existing
+      const demoCand = candidates[0];
+      setActiveCandidateId(demoCand.id);
+      showToast(`Logged in as ${demoCand.name} (${demoCand.email})`);
+      return true;
+    }
+  };
+
+  const registerStudent = (studentData) => {
+    const randomHex = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+    const newId = `cand-std-${Date.now()}`;
+    const dateStr = new Date().toISOString().split('T')[0];
+
+    const newCandidate = {
+      id: newId,
+      name: studentData.name,
+      email: studentData.email,
+      role: studentData.role || 'Full-Stack Software Engineer',
+      avatar: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80`,
+      location: studentData.location || 'Stanford University',
+      bio: studentData.bio || 'Computer Science student focusing on modern Web Apps & AI Pipelines.',
+      verifiedScoreAvg: 88,
+      percentileRank: 'Top 10%',
+      skills: [
+        { name: 'React / Next.js', score: 88, verified: true, date: dateStr },
+        { name: 'Node.js & APIs', score: 85, verified: true, date: dateStr }
+      ],
+      proofOfWork: [],
+      badges: [
+        {
+          id: `badge-init-${Date.now()}`,
+          title: "Verified Student Credential Badge",
+          score: 88,
+          tier: "Gold Level",
+          issuedDate: dateStr,
+          verificationHash: `0x${randomHex}`,
+          proctorVerified: true
+        }
+      ]
+    };
+
+    setCandidates(prev => [newCandidate, ...prev]);
+    setActiveCandidateId(newId);
+    showToast(`Account created for ${studentData.name}! Verified Student Credential Issued.`);
+    return newCandidate;
+  };
+
+  const updateCandidateProfile = (candidateId, updatedData) => {
+    setCandidates(prev =>
+      prev.map(cand => {
+        if (cand.id !== candidateId) return cand;
+
+        const newSkills = updatedData.skills || cand.skills;
+        const newAvg = newSkills.length > 0
+          ? Math.round(newSkills.reduce((acc, s) => acc + s.score, 0) / newSkills.length)
+          : cand.verifiedScoreAvg;
+
+        return {
+          ...cand,
+          ...updatedData,
+          skills: newSkills,
+          verifiedScoreAvg: newAvg
+        };
+      })
+    );
+    showToast("Verified Skill Profile updated successfully!");
+  };
+
   // Algorithmic Auto-Matching Calculator
   const calculateMatchScore = (candidate, project) => {
     if (!candidate || !project || !project.requiredSkills || project.requiredSkills.length === 0) {
@@ -68,9 +144,8 @@ export function AppProvider({ children }) {
       const meetsThreshold = candScore >= req.minScore;
 
       let skillFitScore = candScore;
-      if (!isVerified) skillFitScore *= 0.7; // Unverified skills penalty
+      if (!isVerified) skillFitScore *= 0.7;
 
-      // Weight based on threshold
       accumulatedScore += skillFitScore;
       totalWeight += 100;
 
@@ -83,10 +158,8 @@ export function AppProvider({ children }) {
       });
     });
 
-    // Calculate base percentage
     let matchPct = Math.round((accumulatedScore / totalWeight) * 100);
 
-    // Boost if candidate has relevant verified proof-of-work
     const relevantProof = candidate.proofOfWork.some(p =>
       p.techStack.some(tech => project.requiredSkills.some(req => tech.toLowerCase().includes(req.name.toLowerCase())))
     );
@@ -100,13 +173,11 @@ export function AppProvider({ children }) {
     };
   };
 
-  // Complete Assessment & Generate Cryptographic Badge
   const completeAssessment = (candidateId, assessmentId, correctCount, totalCount) => {
     const scorePct = Math.round((correctCount / totalCount) * 100);
     const assessment = ASSESSMENT_SUITES.find(a => a.id === assessmentId);
     if (!assessment) return;
 
-    // Generate SHA-256 style mock hex verification hash
     const randomHex = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
     const verificationHash = `0x${randomHex}`;
     const dateStr = new Date().toISOString().split('T')[0];
@@ -129,7 +200,6 @@ export function AppProvider({ children }) {
       prev.map(cand => {
         if (cand.id !== candidateId) return cand;
 
-        // Update or add skill
         const existingSkillIndex = cand.skills.findIndex(s => s.name === assessment.category);
         let updatedSkills = [...cand.skills];
 
@@ -150,13 +220,12 @@ export function AppProvider({ children }) {
         }
 
         const newAvg = Math.round(updatedSkills.reduce((acc, s) => acc + s.score, 0) / updatedSkills.length);
-        const newBadges = [newBadge, ...cand.badges];
 
         return {
           ...cand,
           skills: updatedSkills,
           verifiedScoreAvg: newAvg,
-          badges: newBadges
+          badges: [newBadge, ...cand.badges]
         };
       })
     );
@@ -164,11 +233,9 @@ export function AppProvider({ children }) {
     showToast(`Assessment Completed! You scored ${scorePct}% and earned a Verified ${tier} Badge.`);
   };
 
-  // Verify any cryptographic hash in system
   const verifyHashInSystem = (hashInput) => {
     const cleaned = hashInput.trim().toLowerCase();
     for (const cand of candidates) {
-      // Check badges
       const foundBadge = cand.badges.find(b => b.verificationHash.toLowerCase() === cleaned);
       if (foundBadge) {
         return {
@@ -178,7 +245,6 @@ export function AppProvider({ children }) {
           verified: true
         };
       }
-      // Check proof of work
       const foundPow = cand.proofOfWork.find(p => p.verifiedHash.toLowerCase() === cleaned);
       if (foundPow) {
         return {
@@ -192,7 +258,6 @@ export function AppProvider({ children }) {
     return { verified: false };
   };
 
-  // Create new project
   const createProject = (newProj) => {
     const created = {
       ...newProj,
@@ -204,7 +269,6 @@ export function AppProvider({ children }) {
     showToast(`Project "${newProj.title}" posted successfully! Talent auto-matching enabled.`);
   };
 
-  // Apply to project
   const applyToProject = (candidateId, projectId) => {
     const existing = applications.find(a => a.candidateId === candidateId && a.projectId === projectId);
     if (existing) {
@@ -229,7 +293,6 @@ export function AppProvider({ children }) {
     showToast(`Successfully applied to "${proj.title}" with a ${match.totalScore}% match rating!`);
   };
 
-  // Add proof of work
   const addProofOfWork = (candidateId, proof) => {
     const randomHex = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
     const newPow = {
@@ -273,6 +336,9 @@ export function AppProvider({ children }) {
         setSelectedCandidateForRecruiter,
         notification,
         showToast,
+        loginStudent,
+        registerStudent,
+        updateCandidateProfile,
         calculateMatchScore,
         completeAssessment,
         verifyHashInSystem,

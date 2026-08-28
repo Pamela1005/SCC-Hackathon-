@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ShieldCheck, UserCheck, Briefcase, Award, Search, Key, Sparkles, Code2, Users, FolderPlus } from 'lucide-react';
+import { ShieldCheck, UserCheck, Briefcase, Award, Search, Key, Sparkles, Code2, Users, FolderPlus, LogIn, GraduationCap } from 'lucide-react';
 
 export function Navbar() {
   const {
@@ -46,7 +46,7 @@ export function Navbar() {
           </div>
 
           {/* Quick Hash Verifier Input (Center) */}
-          <form onSubmit={handleQuickVerify} className="hidden md:flex items-center relative w-72">
+          <form onSubmit={handleQuickVerify} className="hidden md:flex items-center relative w-64">
             <Key className="w-3.5 h-3.5 absolute left-3 text-slate-500" />
             <input
               type="text"
@@ -61,22 +61,34 @@ export function Navbar() {
           </form>
 
           {/* Role Navigation Switcher */}
-          <div className="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+          <div className="flex items-center gap-1.5 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
+            <button
+              onClick={() => setActiveRole('student_login')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                activeRole === 'student_login'
+                  ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/20'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Student Login</span>
+            </button>
+
             <button
               onClick={() => setActiveRole('candidate')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 activeRole === 'candidate'
                   ? 'bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
               }`}
             >
               <UserCheck className="w-3.5 h-3.5" />
-              <span>Candidate Portal</span>
+              <span>Candidate Hub</span>
             </button>
 
             <button
               onClick={() => setActiveRole('recruiter')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 activeRole === 'recruiter'
                   ? 'bg-gradient-to-r from-cyan-600 to-emerald-600 text-white shadow-md shadow-cyan-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -88,7 +100,7 @@ export function Navbar() {
 
             <button
               onClick={() => setActiveRole('project_creator')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 activeRole === 'project_creator'
                   ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
@@ -99,8 +111,8 @@ export function Navbar() {
             </button>
           </div>
 
-          {/* Right Side: Demo Candidate Selector & Status */}
-          <div className="hidden lg:flex items-center gap-3">
+          {/* Right Side: Active Student Selector */}
+          <div className="hidden xl:flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800">
               <img
                 src={activeCandidate.avatar}
