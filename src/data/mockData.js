@@ -2,6 +2,20 @@
 
 export const INITIAL_CANDIDATES = [
   {
+    id: "cand-new",
+    name: "New Student (Unassessed)",
+    role: "Junior Software Developer",
+    avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80",
+    location: "Stanford University",
+    bio: "Computer Science student. Take your first proctored assessment to earn a verified SHA-256 badge and compute your score!",
+    email: "student@university.edu",
+    verifiedScoreAvg: 0,
+    percentileRank: "Unranked",
+    skills: [],
+    proofOfWork: [],
+    badges: []
+  },
+  {
     id: "cand-1",
     name: "Alex Vance",
     role: "Senior Full-Stack Engineer",

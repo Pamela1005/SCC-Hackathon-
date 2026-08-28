@@ -6,7 +6,7 @@ const AppContext = createContext();
 export function AppProvider({ children }) {
   // Default to 'student_login' so Student Login Page opens FIRST on load!
   const [activeRole, setActiveRole] = useState('student_login');
-  const [activeCandidateId, setActiveCandidateId] = useState('cand-1');
+  const [activeCandidateId, setActiveCandidateId] = useState('cand-new');
   
   const [candidates, setCandidates] = useState(() => {
     const saved = localStorage.getItem('skillproof_candidates');
@@ -65,41 +65,27 @@ export function AppProvider({ children }) {
   };
 
   const registerStudent = (studentData) => {
-    const randomHex = Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
     const newId = `cand-std-${Date.now()}`;
-    const dateStr = new Date().toISOString().split('T')[0];
 
+    // New registered student starts with 0 score until an assessment is completed!
     const newCandidate = {
       id: newId,
       name: studentData.name,
       email: studentData.email,
-      role: studentData.role || 'Full-Stack Software Engineer',
-      avatar: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80`,
+      role: studentData.role || 'Junior Software Engineer',
+      avatar: `https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80`,
       location: studentData.location || 'Stanford University',
-      bio: studentData.bio || 'Computer Science student focusing on modern Web Apps & AI Pipelines.',
-      verifiedScoreAvg: 88,
-      percentileRank: 'Top 10%',
-      skills: [
-        { name: 'React / Next.js', score: 88, verified: true, date: dateStr },
-        { name: 'Node.js & APIs', score: 85, verified: true, date: dateStr }
-      ],
+      bio: studentData.bio || 'Newly registered CS student. Take structured assessments to earn verified badges and calculate your score!',
+      verifiedScoreAvg: 0,
+      percentileRank: 'Unranked',
+      skills: [],
       proofOfWork: [],
-      badges: [
-        {
-          id: `badge-init-${Date.now()}`,
-          title: "Verified Student Credential Badge",
-          score: 88,
-          tier: "Gold Level",
-          issuedDate: dateStr,
-          verificationHash: `0x${randomHex}`,
-          proctorVerified: true
-        }
-      ]
+      badges: []
     };
 
     setCandidates(prev => [newCandidate, ...prev]);
     setActiveCandidateId(newId);
-    showToast(`Account created for ${studentData.name}! Verified Student Credential Issued.`);
+    showToast(`Account created for ${studentData.name}! Take your first assessment to calculate your verified score.`);
     return newCandidate;
   };
 
@@ -220,11 +206,15 @@ export function AppProvider({ children }) {
         }
 
         const newAvg = Math.round(updatedSkills.reduce((acc, s) => acc + s.score, 0) / updatedSkills.length);
+        let percentile = "Top 10%";
+        if (newAvg >= 95) percentile = "Top 1%";
+        else if (newAvg >= 90) percentile = "Top 3%";
 
         return {
           ...cand,
           skills: updatedSkills,
           verifiedScoreAvg: newAvg,
+          percentileRank: percentile,
           badges: [newBadge, ...cand.badges]
         };
       })
