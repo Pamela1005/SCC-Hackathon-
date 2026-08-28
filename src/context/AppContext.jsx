@@ -4,7 +4,6 @@ import { INITIAL_CANDIDATES, ASSESSMENT_SUITES, REAL_WORLD_PROJECTS } from '../d
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  // Default to 'student_login' so Student Login Page opens FIRST on load!
   const [activeRole, setActiveRole] = useState('student_login');
   const [activeCandidateId, setActiveCandidateId] = useState('cand-new');
   
@@ -53,6 +52,10 @@ export function AppProvider({ children }) {
   const loginStudent = (email, password) => {
     const found = candidates.find(c => c.email.toLowerCase() === email.toLowerCase());
     if (found) {
+      if (found.password && found.password !== password) {
+        showToast("Incorrect password. Please verify your custom password.", "error");
+        return false;
+      }
       setActiveCandidateId(found.id);
       showToast(`Welcome back, ${found.name}! Signed into Student Verified Portal.`);
       return true;
@@ -67,11 +70,11 @@ export function AppProvider({ children }) {
   const registerStudent = (studentData) => {
     const newId = `cand-std-${Date.now()}`;
 
-    // New registered student starts with 0 score until an assessment is completed!
     const newCandidate = {
       id: newId,
       name: studentData.name,
       email: studentData.email,
+      password: studentData.password, // Custom created student password
       role: studentData.role || 'Junior Software Engineer',
       avatar: `https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80`,
       location: studentData.location || 'Stanford University',
@@ -85,7 +88,7 @@ export function AppProvider({ children }) {
 
     setCandidates(prev => [newCandidate, ...prev]);
     setActiveCandidateId(newId);
-    showToast(`Account created for ${studentData.name}! Take your first assessment to calculate your verified score.`);
+    showToast(`Account created for ${studentData.name} with custom password! Take your first assessment to calculate your score.`);
     return newCandidate;
   };
 

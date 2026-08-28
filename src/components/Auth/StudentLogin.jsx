@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { ShieldCheck, User, Lock, Mail, GraduationCap, ArrowRight, Sparkles, CheckCircle2, Key, Star } from 'lucide-react';
+import { ShieldCheck, User, Lock, Mail, GraduationCap, ArrowRight, Sparkles, CheckCircle2, Key, Star, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export function StudentLogin({ onSuccess }) {
   const { candidates, loginStudent, registerStudent, showToast, setActiveRole } = useApp();
   const [isRegistering, setIsRegistering] = useState(false);
 
   // Login form state
-  const [loginEmail, setLoginEmail] = useState('alex.vance@skillproof.io');
-  const [loginPassword, setLoginPassword] = useState('password123');
+  const [loginEmail, setLoginEmail] = useState('student@university.edu');
+  const [loginPassword, setLoginPassword] = useState('student123');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Register form state
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
   const [regRole, setRegRole] = useState('Full-Stack Software Engineer');
   const [regUniversity, setRegUniversity] = useState('Stanford University');
   const [regBio, setRegBio] = useState('Passionate CS student specializing in scalable Web & AI systems.');
@@ -31,9 +34,20 @@ export function StudentLogin({ onSuccess }) {
     e.preventDefault();
     if (!regName.trim() || !regEmail.trim()) return;
 
+    if (!regPassword || regPassword.length < 6) {
+      showToast("Password must be at least 6 characters long.", "error");
+      return;
+    }
+
+    if (regPassword !== regConfirmPassword) {
+      showToast("Passwords do not match. Please verify your custom password.", "error");
+      return;
+    }
+
     const newCandidate = registerStudent({
       name: regName,
       email: regEmail,
+      password: regPassword,
       role: regRole,
       bio: `${regBio} (${regUniversity})`,
       location: regUniversity,
@@ -48,7 +62,7 @@ export function StudentLogin({ onSuccess }) {
   const handleQuickDemoSelect = (candidateId) => {
     const cand = candidates.find(c => c.id === candidateId);
     if (cand) {
-      loginStudent(cand.email, 'password123');
+      loginStudent(cand.email, cand.password || 'password123');
       setActiveRole('candidate');
       if (onSuccess) onSuccess();
     }
@@ -109,17 +123,24 @@ export function StudentLogin({ onSuccess }) {
             </div>
 
             <div>
-              <label className="block text-slate-400 font-semibold mb-1">Password</label>
+              <label className="block text-slate-400 font-semibold mb-1">Your Password</label>
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
                 <input
-                  type="password"
+                  type={showLoginPassword ? "text" : "password"}
                   required
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500"
+                  placeholder="Enter your custom password"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  className="absolute right-3 top-3 text-slate-500 hover:text-slate-300"
+                >
+                  {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
@@ -181,6 +202,48 @@ export function StudentLogin({ onSuccess }) {
               </div>
             </div>
 
+            {/* Custom Password Creation Fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-slate-400 font-semibold mb-1">Create Custom Password</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                  <input
+                    type={showRegPassword ? "text" : "password"}
+                    required
+                    minLength={6}
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    placeholder="Min 6 characters"
+                    className="w-full pl-10 pr-10 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegPassword(!showRegPassword)}
+                    className="absolute right-3 top-3 text-slate-500 hover:text-slate-300"
+                  >
+                    {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 font-semibold mb-1">Confirm Custom Password</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+                  <input
+                    type={showRegPassword ? "text" : "password"}
+                    required
+                    minLength={6}
+                    value={regConfirmPassword}
+                    onChange={(e) => setRegConfirmPassword(e.target.value)}
+                    placeholder="Repeat password"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-slate-400 font-semibold mb-1">Target Engineering Role</label>
@@ -223,7 +286,7 @@ export function StudentLogin({ onSuccess }) {
               className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 via-cyan-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition-all"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Create Verified Student Account</span>
+              <span>Create Verified Account with Custom Password</span>
             </button>
           </form>
         )}
