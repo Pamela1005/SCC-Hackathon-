@@ -4,7 +4,8 @@ import { INITIAL_CANDIDATES, ASSESSMENT_SUITES, REAL_WORLD_PROJECTS } from '../d
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const [activeRole, setActiveRole] = useState('candidate'); // 'candidate' | 'recruiter' | 'project_creator' | 'student_login'
+  // Default to 'student_login' so Student Login Page opens FIRST on load!
+  const [activeRole, setActiveRole] = useState('student_login');
   const [activeCandidateId, setActiveCandidateId] = useState('cand-1');
   
   const [candidates, setCandidates] = useState(() => {
@@ -56,7 +57,6 @@ export function AppProvider({ children }) {
       showToast(`Welcome back, ${found.name}! Signed into Student Verified Portal.`);
       return true;
     } else {
-      // Create session for entered email if not existing
       const demoCand = candidates[0];
       setActiveCandidateId(demoCand.id);
       showToast(`Logged in as ${demoCand.name} (${demoCand.email})`);

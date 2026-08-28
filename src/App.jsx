@@ -12,7 +12,8 @@ import { Award, Briefcase, UserCheck, CheckCircle2, Info, Sparkles, GraduationCa
 
 export function AppContent() {
   const { activeRole, notification } = useApp();
-  const [candidateTab, setCandidateTab] = useState('assessments');
+  // Default candidate tab to 'portfolio' so signing in opens their Verified Skill Profile directly!
+  const [candidateTab, setCandidateTab] = useState('portfolio');
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
@@ -47,6 +48,18 @@ export function AppContent() {
             {/* Candidate Internal Module Tabs */}
             <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-slate-900/90 border border-slate-800 w-full sm:w-auto overflow-x-auto">
               <button
+                onClick={() => setCandidateTab('portfolio')}
+                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                  candidateTab === 'portfolio'
+                    ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+                }`}
+              >
+                <UserCheck className="w-4 h-4" />
+                <span>1. Verified Digital Portfolio</span>
+              </button>
+
+              <button
                 onClick={() => setCandidateTab('assessments')}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                   candidateTab === 'assessments'
@@ -55,7 +68,7 @@ export function AppContent() {
                 }`}
               >
                 <Award className="w-4 h-4" />
-                <span>1. Structured Assessments</span>
+                <span>2. Structured Assessments</span>
               </button>
 
               <button
@@ -67,26 +80,14 @@ export function AppContent() {
                 }`}
               >
                 <Briefcase className="w-4 h-4" />
-                <span>2. Auto-Matched Projects</span>
-              </button>
-
-              <button
-                onClick={() => setCandidateTab('portfolio')}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                  candidateTab === 'portfolio'
-                    ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-                }`}
-              >
-                <UserCheck className="w-4 h-4" />
-                <span>3. Verified Portfolio</span>
+                <span>3. Auto-Matched Projects</span>
               </button>
             </div>
 
             {/* Candidate Module Content */}
+            {candidateTab === 'portfolio' && <VerifiedPortfolio />}
             {candidateTab === 'assessments' && <AssessmentCatalog />}
             {candidateTab === 'matching' && <AutoMatchingHub />}
-            {candidateTab === 'portfolio' && <VerifiedPortfolio />}
 
           </div>
         )}
