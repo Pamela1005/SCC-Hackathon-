@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { ShieldCheck, UserCheck, Briefcase, Award, Search, Key, Sparkles, Code2, Users, FolderPlus, LogIn, GraduationCap } from 'lucide-react';
+import { InitialAvatar } from './InitialAvatar';
 
 export function Navbar() {
   const {
@@ -111,14 +112,10 @@ export function Navbar() {
             </button>
           </div>
 
-          {/* Right Side: Active Student Selector */}
+          {/* Right Side: Active Student Selector with Initial Avatar */}
           <div className="hidden xl:flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800">
-              <img
-                src={activeCandidate.avatar}
-                alt={activeCandidate.name}
-                className="w-6 h-6 rounded-full object-cover ring-2 ring-indigo-500/40"
-              />
+              <InitialAvatar name={activeCandidate.name} size="xs" />
               <select
                 value={activeCandidateId}
                 onChange={(e) => setActiveCandidateId(e.target.value)}

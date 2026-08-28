@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Sparkles, Briefcase, CheckCircle2, AlertTriangle, ArrowUpRight, DollarSign, Clock, Filter, Award, ShieldCheck, UserCheck, Star } from 'lucide-react';
+import { InitialAvatar } from '../InitialAvatar';
 
 export function AutoMatchingHub() {
   const { activeCandidate, projects, applications, calculateMatchScore, applyToProject, setActiveRole } = useApp();
@@ -9,7 +10,6 @@ export function AutoMatchingHub() {
 
   const domains = ['All', 'Fintech & Web Architecture', 'AI & Machine Learning', 'UI/UX & Design Systems', 'Backend Infrastructure'];
 
-  // Calculate project relevance to candidate role
   const checkRoleFit = (project, candidateRole) => {
     if (!candidateRole) return true;
     const roleLower = candidateRole.toLowerCase();
@@ -25,18 +25,15 @@ export function AutoMatchingHub() {
     if (roleLower.includes('backend') || roleLower.includes('microservice') || roleLower.includes('cloud')) {
       return domainLower.includes('backend') || domainLower.includes('infrastructure') || descLower.includes('node');
     }
-    // Default Fullstack / Web
     return domainLower.includes('web') || domainLower.includes('fintech') || descLower.includes('react');
   };
 
-  // Filter & Sort Projects by Candidate Role & Match Score
   let processedProjects = projects.filter(p => {
     const matchesDomain = selectedDomain === 'All' || p.domain === selectedDomain;
     const matchesRole = !filterByRoleOnly || checkRoleFit(p, activeCandidate.role);
     return matchesDomain && matchesRole;
   });
 
-  // Sort by candidate match score & role fit
   processedProjects.sort((a, b) => {
     const scoreA = calculateMatchScore(activeCandidate, a).totalScore;
     const scoreB = calculateMatchScore(activeCandidate, b).totalScore;
@@ -71,11 +68,7 @@ export function AutoMatchingHub() {
 
           <div className="flex flex-wrap items-center gap-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800 text-xs">
             <div className="flex items-center gap-3">
-              <img
-                src={activeCandidate.avatar}
-                alt={activeCandidate.name}
-                className="w-10 h-10 rounded-xl object-cover ring-2 ring-cyan-500/40"
-              />
+              <InitialAvatar name={activeCandidate.name} size="md" />
               <div>
                 <span className="text-slate-400 text-[11px] block">Student Profile & Role</span>
                 <span className="text-white font-bold">{activeCandidate.name} • <span className="text-cyan-400 font-semibold">{activeCandidate.role}</span></span>
@@ -109,7 +102,6 @@ export function AutoMatchingHub() {
           ))}
         </div>
 
-        {/* Filter by Role Only Checkbox */}
         <button
           onClick={() => setFilterByRoleOnly(!filterByRoleOnly)}
           className={`px-4 py-2 rounded-xl text-xs font-bold border flex items-center gap-2 transition-all ${
@@ -163,7 +155,6 @@ export function AutoMatchingHub() {
                         {project.domain}
                       </span>
 
-                      {/* Tailored Student Role Badge */}
                       {isRoleMatched && (
                         <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/40 text-[10px] font-bold text-emerald-400 flex items-center gap-1">
                           <UserCheck className="w-3 h-3" /> Tailored for {activeCandidate.role}
@@ -197,7 +188,6 @@ export function AutoMatchingHub() {
               {/* Project Body */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 my-6">
                 
-                {/* Column 1 & 2: Overview & Deliverables */}
                 <div className="lg:col-span-2 space-y-4">
                   <p className="text-xs text-slate-300 leading-relaxed">{project.description}</p>
                   
@@ -214,7 +204,6 @@ export function AutoMatchingHub() {
                   </div>
                 </div>
 
-                {/* Column 3: Skill Compatibility Radar */}
                 <div className="bg-slate-950/80 p-5 rounded-2xl border border-slate-800/80 space-y-3">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
                     <span>Verified Skill Fit</span>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ShieldCheck, User, Lock, Mail, GraduationCap, ArrowRight, Sparkles, CheckCircle2, Key, Star, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { InitialAvatar } from '../InitialAvatar';
 
 export function StudentLogin({ onSuccess }) {
   const { candidates, loginStudent, registerStudent, showToast, setActiveRole } = useApp();
@@ -163,7 +164,7 @@ export function StudentLogin({ onSuccess }) {
                     onClick={() => handleQuickDemoSelect(c.id)}
                     className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-left transition-all flex items-center gap-2"
                   >
-                    <img src={c.avatar} alt={c.name} className="w-7 h-7 rounded-full object-cover shrink-0" />
+                    <InitialAvatar name={c.name} size="xs" />
                     <div className="truncate">
                       <span className="text-[11px] font-bold text-white block truncate">{c.name}</span>
                       <span className="text-[9px] text-emerald-400 font-bold">{c.verifiedScoreAvg}% Avg</span>

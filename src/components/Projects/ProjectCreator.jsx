@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { FolderPlus, DollarSign, Clock, CheckCircle2, Sparkles, UserCheck, ShieldCheck, Plus, Trash2 } from 'lucide-react';
+import { InitialAvatar } from '../InitialAvatar';
 
 export function ProjectCreator() {
   const { createProject, candidates, calculateMatchScore, setActiveRole } = useApp();
@@ -21,7 +22,6 @@ export function ProjectCreator() {
     'High-throughput API microservices with sub-50ms latency',
     'Tested frontend application with 95%+ Lighthouse performance score'
   ]);
-  const [newDeliv, setNewDeliv] = useState('');
 
   const handleAddSkill = () => {
     setSkillsRequired(prev => [...prev, { name: 'Python & ML Pipelines', minScore: 80 }]);
@@ -29,13 +29,6 @@ export function ProjectCreator() {
 
   const handleRemoveSkill = (index) => {
     setSkillsRequired(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleAddDeliverable = () => {
-    if (newDeliv.trim()) {
-      setDeliverables(prev => [...prev, newDeliv.trim()]);
-      setNewDeliv('');
-    }
   };
 
   const handleSubmit = (e) => {
@@ -60,7 +53,6 @@ export function ProjectCreator() {
     setActiveRole('candidate');
   };
 
-  // Preview live candidate match preview for draft project
   const draftProj = { requiredSkills: skillsRequired };
   const rankedPreview = candidates.map(c => ({
     candidate: c,
@@ -254,7 +246,7 @@ export function ProjectCreator() {
             {rankedPreview.map((item, idx) => (
               <div key={idx} className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <img src={item.candidate.avatar} alt={item.candidate.name} className="w-10 h-10 rounded-xl object-cover" />
+                  <InitialAvatar name={item.candidate.name} size="md" />
                   <div>
                     <h4 className="text-xs font-bold text-white leading-snug">{item.candidate.name}</h4>
                     <span className="text-[10px] text-slate-400">{item.candidate.role}</span>

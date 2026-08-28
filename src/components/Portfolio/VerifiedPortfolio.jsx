@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ShieldCheck, Award, GitBranch, ExternalLink, Key, Plus, Sparkles, MapPin, Mail, CheckCircle2, User, FileCode, Share2, Layers, Edit3, Play } from 'lucide-react';
 import { EditSkillProfileModal } from './EditSkillProfileModal';
+import { InitialAvatar } from '../InitialAvatar';
 
 export function VerifiedPortfolio() {
   const { activeCandidate, setActiveVerificationModal, addProofOfWork, setActiveAssessment, assessments } = useApp();
@@ -48,11 +49,7 @@ export function VerifiedPortfolio() {
           
           <div className="flex items-start gap-5">
             <div className="relative">
-              <img
-                src={activeCandidate.avatar}
-                alt={activeCandidate.name}
-                className="w-24 h-24 rounded-2xl object-cover ring-4 ring-indigo-500/40 shadow-xl"
-              />
+              <InitialAvatar name={activeCandidate.name} size="xl" />
               <div className="absolute -bottom-2 -right-2 p-1.5 rounded-xl bg-emerald-500 text-slate-950 shadow-lg">
                 <ShieldCheck className="w-4 h-4" />
               </div>

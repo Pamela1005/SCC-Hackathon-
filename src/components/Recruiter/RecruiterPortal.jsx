@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Search, ShieldCheck, Award, UserCheck, CheckCircle2, ArrowRight, Filter, Key, GitBranch, ExternalLink, Calendar, Send, Sparkles, Eye, Scale } from 'lucide-react';
+import { InitialAvatar } from '../InitialAvatar';
 
 export function RecruiterPortal() {
   const { candidates, setActiveCandidateId, setActiveVerificationModal, setActiveRole, showToast } = useApp();
@@ -112,11 +113,7 @@ export function RecruiterPortal() {
               <div>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <img
-                      src={cand.avatar}
-                      alt={cand.name}
-                      className="w-12 h-12 rounded-xl object-cover ring-2 ring-emerald-500/30"
-                    />
+                    <InitialAvatar name={cand.name} size="lg" />
                     <div>
                       <h3 className="text-base font-bold text-white leading-snug">{cand.name}</h3>
                       <p className="text-xs text-cyan-400 font-medium">{cand.role}</p>
@@ -146,7 +143,6 @@ export function RecruiterPortal() {
                   </div>
                 </div>
 
-                {/* Verified Skills */}
                 <div className="space-y-1.5 mb-6">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Verified Skill Scores</span>
                   <div className="flex flex-wrap gap-1.5">
@@ -163,7 +159,6 @@ export function RecruiterPortal() {
                 </div>
               </div>
 
-              {/* Card Footer Actions */}
               <div className="pt-4 border-t border-slate-800/80 flex items-center gap-2">
                 <button
                   onClick={() => {
@@ -233,7 +228,7 @@ export function RecruiterPortal() {
                   return (
                     <tr key={cand.id} className="hover:bg-slate-900/60">
                       <td className="p-3 font-bold text-white flex items-center gap-2">
-                        <img src={cand.avatar} alt={cand.name} className="w-6 h-6 rounded-full object-cover" />
+                        <InitialAvatar name={cand.name} size="xs" />
                         <span>{cand.name}</span>
                       </td>
                       <td className="p-3 text-emerald-400 font-bold">{cand.verifiedScoreAvg}%</td>
